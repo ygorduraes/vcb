@@ -4,8 +4,8 @@
   "description": "Vai Chover Belém",
   "main": "index.js",
   "scripts": {
-    "nvm": "nvm use",
-    "test": "nvm use && node index.js"
+    "start": "node index.js",
+    "test": "node index.js"
   },
   "repository": {
     "type": "git",
