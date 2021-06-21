@@ -9,7 +9,7 @@ const client = new Client({
 
 client.connect();
 
-client.query('SELECT * FROM cidades WHERE cidade="BEL";', (err, res) => {
+client.query('SELECT vaichover FROM cidades WHERE cidade="BEL";', (err, res) => {
   if (err) throw err;
   for (let row of res.rows) {
     console.log(JSON.stringify(row));

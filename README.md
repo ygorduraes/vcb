@@ -12,6 +12,11 @@ Vai Chover Belém
 - Switch to the target Node version with `nvm use`
 - Install Node requirements with `npm i`
 
+## Getting info from heroku
+
+App info: `heroku pg:info -a vaichoverbelem`
+Logs: `heroku logs -t -a vaichoverbelem`
+
 ## Testing
 - Run `npm test`
 
