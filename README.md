@@ -14,6 +14,7 @@ Vai Chover Belém
 
 ## Getting info from heroku
 
+App info: `heroku ps -a vaichoverbelem`
 Logs: `heroku logs -t -a vaichoverbelem`
 
 ## Testing
@@ -33,7 +34,7 @@ For other operational systems, please check the official Postgres documentation
 
 Postgres's app info: `heroku pg:info -a vaichoverbelem`
 
-Connecting locally to Heroku's database: `heroku pg:psql -a vaichoverbelem`
+Connecting to Heroku's database: `heroku pg:psql -a vaichoverbelem`
 
 Pulling the database locally (for development): `heroku pg:pull postgresql-polished-86943 vaichoverbelem -a vaichoverbelem`
 
@@ -43,5 +44,9 @@ DATABASE_URL=postgres://username:password@localhost:5432/vaichoverbelem
 ```
 
 Note: usually, the username/password for locally-installed Postgres databases is the system's username.
+
+Connecting to the local database: `psql -h localhost -d vaichoverbelem`
+
+Updating the status for testing purposes: `UPDATE cidades SET vaichover=false WHERE cidade='BEL';`
 
 If you get a connection error (instance not running), please check if you're connected to a VPN, and disconnect prior to trying agin.
