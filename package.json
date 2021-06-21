@@ -1,0 +1,23 @@
+{
+  "name": "vcb",
+  "version": "1.0.0",
+  "description": "Vai Chover Belém",
+  "main": "index.js",
+  "scripts": {
+    "nvm": "nvm use",
+    "test": "nvm use && node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ygorduraes/vcb.git"
+  },
+  "author": "Ygor Durães",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ygorduraes/vcb/issues"
+  },
+  "homepage": "https://github.com/ygorduraes/vcb#readme",
+  "dependencies": {
+    "http": "^0.0.1-security"
+  }
+}
