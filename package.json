@@ -19,5 +19,8 @@
   "homepage": "https://github.com/ygorduraes/vcb#readme",
   "dependencies": {
     "http": "^0.0.1-security"
+  },
+  "engines": {
+    "node": "16.3.0"
   }
 }
