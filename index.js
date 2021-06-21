@@ -1,11 +1,21 @@
+require('dotenv').config();
 const { Client } = require('pg');
 
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const connectionString = process.env.DATABASE_URL;
+
+const isLocal = connectionString.indexOf('localhost') > -1;
+
+const clientSettings = {
+    connectionString,
+};
+
+if (!isLocal) {
+    clientSettings.ssl = {
+        rejectUnauthorized: false,
+    };
+}
+
+const client = new Client(clientSettings);
 
 client.connect();
 

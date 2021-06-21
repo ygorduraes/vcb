@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/ygorduraes/vcb#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "http": "^0.0.1-security",
     "pg": "^8.6.0"
   },
