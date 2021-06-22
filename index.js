@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client } = require('pg');
 const http = require('http');
+const https = require('https');
 const request = require('request');
 var _ = require('lodash');
 
@@ -42,22 +43,25 @@ const getMETAR = async () =>  {
     const headers = {
         'X-Api-Key': redemetKey,
     };
-    	
+
     const options = {
-        url,
+        hostname: 'api-redemet.decea.mil.br',
+        path: '/mensagens/metar/SBJC,SBBE',
+        port: 443,
         method: 'GET',
         headers,
     };
     
-    return new Promise((resolve,reject) => {
-       request.get(options, (error,response,body) => {
-           if (error){
-               reject(error);
-           }else{
-               resolve({ response, body });
-           }
-       }) 
-    });
+    return new Promise((resolve, reject) => {
+        const req = https.get(options, (res) => {
+            res.on('data', (data) => {
+                resolve({ res, data });
+            });
+        });
+        req.on('error', (error) => {
+            reject(error);
+        })
+     });
 };
 
 const getNow = () => {
@@ -93,7 +97,45 @@ const checkRain = (metar) => {
     return metarRain;
 }
 
+function sendTweet(message){
+    // var headers = {
+    //     'User-Agent':       'Super Agent/0.0.1',
+    //     'Content-Type':     'application/json'
+    // }
+    
+    const params = {
+    		consumer_key : consumerKey,
+    		consumer_secret : consumerSecret,
+    		access_token_key : accessTokenKey,
+    		access_token_secret : accessTokenSecret,
+    		// tweet : message
+            search: '@ygorduraes',
+            count: 5,
+    }
+    	
+    var options = {
+        url: 'http://localhost:3000/api/v1/search',
+        method: 'POST',
+        // headers: headers,
+        json: params
+    }
+    
+    return new Promise(function(resolve,reject){
+       request.post(options, (error, response, body) => {
+           if (error){
+               console.error('Error:', error); // Print the error if one occurred
+               reject(error);
+           }else{
+               console.log('Post tweet statusCode:', response && response.statusCode); // Print the response status code if a response was received
+               console.log('body:', body); // Print the body
+               resolve(body);
+           }
+       }) 
+    });
+}
+
 async function vaiChoverBelem() {
+    // sendTweet('Teste');
     //Gets Hours and Minutes
     const now = getNow();
     console.log("Now: " + now);
@@ -102,12 +144,12 @@ async function vaiChoverBelem() {
     const metarResponse = await getMETAR();
     
     // Validates Status Code
-    const statusCode = metarResponse.response.statusCode;
+    const statusCode = metarResponse.res.statusCode;
     if (statusCode !== 200) {
         throw new Error(`Status code: ${statusCode}`);
     }
 
-    const body = JSON.parse(metarResponse.body);
+    const body = JSON.parse(metarResponse.data);
 
     // Looks for METAR data and throws error if not found
     if (!body.data) {
