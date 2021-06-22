@@ -42,6 +42,8 @@ ACCESS_TOKEN_KEY=
 ACCESS_TOKEN_SECRET=
 ```
 
+Note: REDEMET's API for METAR info is `https://api-redemet.decea.mil.br/mensagens/metar/SBJC,SBBE`. You'll ned an API Key, which you can request at https://www.atd-1.com/cadastro-api/ (you might receive it instantly at your e-mail).
+
 ## Database
 This project uses Postgres as the database to store the last rain status.
 

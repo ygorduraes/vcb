@@ -158,13 +158,13 @@ async function vaiChoverBelem() {
 
         // Sends tweet if database rain is false and METAR rain is true
         if (!belRain && metarRain) {
-            const message = "Vai chover" + " " + now;
+            const message = `Vai chover ${now}`;
             // Sends Telegram message
             // TO DO
 
             // Sends Tweet
             // TO DO
-            console.log("Tweet enviado:", message);
+            console.log("Tweet sent:", message);
             return;
         }
 
