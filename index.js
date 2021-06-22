@@ -72,7 +72,7 @@ const req = http.get(url, (res) => {
         console.log("Rain:", metarRain);
         
         client.connect();
-        metarRain = true; // TESTING PURPOSES
+        // metarRain = true; // TESTING PURPOSES
         //Consulta se o ultimo status é de chuva (true)
         client.query("SELECT * FROM cidades WHERE cidade='BEL';", (err, res) => {
             if (err) throw err;
