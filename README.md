@@ -17,6 +17,10 @@ Vai Chover Belém
 App info: `heroku ps -a vaichoverbelem`
 Logs: `heroku logs -t -a vaichoverbelem`
 
+## Scaling up app on Heroku
+
+`heroku ps:scale -a vaichoverbelem worker=1`
+
 ## Testing
 - Run `npm test`
 
