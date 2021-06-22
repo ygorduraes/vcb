@@ -38,190 +38,145 @@ if (!isLocal) {
 
 const client = new Client(clientSettings);
 
-const req = http.get(url, (res) => {
-    let body = '';
+const getMETAR = async () =>  {
+    const headers = {
+        'X-Api-Key': redemetKey,
+    };
+    	
+    const options = {
+        url,
+        method: 'GET',
+        headers,
+    };
     
-    console.log(url);
-    console.log('Status:', res.statusCode);
-    res.setEncoding('utf8');
-    res.on('data', (chunk) => body += chunk);
-    res.on('end', () => {
-        console.log('Successfully processed HTTP response');
-        console.log(body);
-        
-        // body = 'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo failed: Nome ou serviço desconhecido' // Testing errors
-        
-        //Verifica erros na API da REDEMET
-        if (body.indexOf("SQLSTATE") !== -1){
-            console.log("Erro na API da REDEMET");
+    return new Promise((resolve,reject) => {
+       request.get(options, (error,response,body) => {
+           if (error){
+               reject(error);
+           }else{
+               resolve({ response, body });
+           }
+       }) 
+    });
+};
+
+const getNow = () => {
+    const belemTZ = new Date().toLocaleString("en-US", { timeZone: "America/Belem"});
+    const date = new Date(belemTZ);
+    let hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+    if (hour<0) {
+        hour+=24
+    }
+    
+    let min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+    
+    const nowString = "(" + hour + ":" + min + ")";
+    return nowString;
+}
+
+const checkRain = (metar) => {
+    let metarRain = false;
+    for (let i in metar){
+        console.log(`Checking ${metar[i].id_localidade}...`);
+        if ((metar[i].mens.indexOf("RA") !== -1 
+                || metar[i].mens.indexOf("TS") !== -1
+                || metar[i].mens.indexOf("SH") !== -1
+                || metar[i].mens.indexOf("VCSH") !== -1) 
+            && (metar[i].mens.indexOf("RERA") == -1 && metar[i].mens.indexOf("VCTS") == -1) ){
+            metarRain = true;
+        }
+        console.log(`Metar ${metar[i].id_localidade} rain result:`, metarRain);
+    }
+
+    return metarRain;
+}
+
+async function vaiChoverBelem() {
+    //Gets Hours and Minutes
+    const now = getNow();
+    console.log("Now: " + now);
+
+    console.log("Getting METAR from REDEMET's API...")
+    const metarResponse = await getMETAR();
+    
+    // Validates Status Code
+    const statusCode = metarResponse.response.statusCode;
+    if (statusCode !== 200) {
+        throw new Error(`Status code: ${statusCode}`);
+    }
+
+    const body = JSON.parse(metarResponse.body);
+
+    // Looks for METAR data and throws error if not found
+    if (!body.data) {
+        throw new Error('Data not found');
+    }
+
+    const metar = body.data.data;
+    console.log("METARs:", metar);
+
+    
+    // let testMetar  = [
+    //     {
+    //       id_localidade: 'SBBE',
+    //       validade_inicial: '2021-06-22 14:00:00',
+    //       mens: 'METAR SBBE 221400Z 09008KT 9999 SCT030 30/23 Q1014=',
+    //       recebimento: '2021-06-22 13:49:22'
+    //     },
+    //     {
+    //       id_localidade: 'SBJC',
+    //       validade_inicial: '2021-06-22 14:00:00',
+    //       mens: 'METAR SBJC 221400Z 10002KT 9999 BKN020 30/25 Q1014=',
+    //       recebimento: '2021-06-22 13:54:57'
+    //     }
+    // ];
+
+    // Looks for rain
+    const metarRain = checkRain(metar);
+    // const metarRain = true; // TESTING PURPOSES
+    console.log("Rain:", metarRain);
+
+    client.connect();
+    //Consulta se o ultimo status é de chuva (true)
+    client.query("SELECT * FROM cidades WHERE cidade='BEL';", (err, res) => {
+        if (err) throw err;
+        const belResult = _.find(res.rows, ['cidade', 'BEL']);
+        const belRain = belResult.vaichover;
+        console.log('Database status:', belRain);
+
+        // Updates status in the database if they're different
+        if (belRain !== metarRain) {
+            console.log(`Updating rain status (${metarRain}) in the database...`);
+            client.query(`UPDATE cidades SET vaichover=${metarRain} WHERE cidade='BEL';`, (err, res) => {
+                if (err) throw err;
+                console.log('Update succeeded. Row count:', res.rowCount);
+                client.end();
+            });
+        }
+
+        // Sends tweet if database rain is false and METAR rain is true
+        if (!belRain && metarRain) {
+            const message = "Vai chover" + " " + now;
+            // Sends Telegram message
+            // TO DO
+
+            // Sends Tweet
+            // TO DO
+            console.log("Tweet enviado:", message);
             return;
         }
-        
-        //Salva a data e a hora
-        const belemTZ = new Date().toLocaleString("en-US", { timeZone: "America/Belem"});
-        const date = new Date(belemTZ);
-        let hour = date.getHours();
-        hour = (hour < 10 ? "0" : "") + hour;
-        if (hour<0) hour+=24;
-        
-        let min  = date.getMinutes();
-        min = (min < 10 ? "0" : "") + min;
-        
-        const now = "(" + hour + ":" + min + ")";
-        console.log("Now: " + now);
-        
-        //Trata a string para separar METARs e SPECIs e verificar se há sinal de chuva
-        let metarRain = false;
-        const metar = body.split(" - ");
-        //let test  = "2018052316 - METAR SBJC 231600Z 05002KT 9999 BKN020 FEW025TCU 30/25 Q1013= 2018052316 - METAR COR SBBE 231600Z 28006KT 9999 RA BKN025 FEW030TCU 29/24 Q1013= 2018052316 - SPECI SBBE 231635Z 01012KT 2000 BKN010 FEW017TCU 26/24 Q1012=";
-        //metar = test.split(" - ");
-        for (let i in metar){
-            console.log(metar[i]);
-            if ((metar[i].indexOf("RA") !== -1 || metar[i].indexOf("TS") !== -1 || metar[i].indexOf("SH") !== -1 || metar[i].indexOf("VCSH") !== -1) && (metar[i].indexOf("RERA") == -1 && metar[i].indexOf("VCTS") == -1) ){
-                metarRain = true;
-            }
-            console.log(`Metar ${i} rain:`, metarRain);
+
+        // Does nothing if the status is the same
+        if (belRain === metarRain) {
+            console.log(`Database status is the same (${belRain}), do nothing.`);
+            client.end();
+            return
         }
-
-        console.log("Rain:", metarRain);
-        
-        client.connect();
-        // metarRain = true; // TESTING PURPOSES
-        //Consulta se o ultimo status é de chuva (true)
-        client.query("SELECT * FROM cidades WHERE cidade='BEL';", (err, res) => {
-            if (err) throw err;
-            const belResult = _.find(res.rows, ['cidade', 'BEL']);
-            const belRain = belResult.vaichover;
-            console.log('Database status:', belRain);
-
-            // Updates status in the database if they're different
-            if (belRain !== metarRain) {
-                console.log(`Updating rain status (${metarRain}) in the database...`);
-                client.query(`UPDATE cidades SET vaichover=${metarRain} WHERE cidade='BEL';`, (err, res) => {
-                    if (err) throw err;
-                    console.log('Update succeeded. Row count:', res.rowCount);
-                    client.end();
-                });
-            }
-
-            // Sends tweet if database rain is false and METAR rain is true
-            if (!belRain && metarRain) {
-                const message = "Vai chover" + " " + now;
-                // Sends Telegram message
-                // TO DO
-
-                // Sends Tweet
-                // TO DO
-                console.log("Tweet enviado:", message);
-                return;
-            }
-
-            // Does nothing if the status is the same
-            if (belRain === metarRain) {
-                console.log(`Last status is the same (${belRain}), do nothing.`);
-                client.end();
-                return
-            }
-        });
-
-
-        // if (metarRain == "true"){
-        //     const message = "Vai chover" + " " + now;
-        //     client.query("SELECT * FROM cidades WHERE cidade='BEL';", (err, res) => {
-        //         if (err) throw err;
-        //         const belResult = _.find(res.rows, ['cidade', 'BEL']);
-        //         const belLastStatus = belResult.vaichover;
-        //         console.log('belLastStatus', belLastStatus);
-
-        //         if (belLastStatus === false) {
-        //             console.log("Updating rain status in the database...");
-        //             client.query("UPDATE cidades SET vaichover=true WHERE cidade='BEL';", (err, res) => {
-        //                 if (err) throw err;
-        //                 console.log('Update succeeded. Row count:', res.rowCount);
-        //                 client.end();
-        //                 console.log("Tweet enviado:", message);
-        //             });
-        //         }
-
-        //         if (belLastStatus === true) {
-        //             console.log("Last status is rain, does nothing.");
-        //             client.end();
-        //         }
-        //     });
-
-            // let paramsQuery = {
-            //     TableName : table,
-            //     KeyConditionExpression: "#c = :c",
-            //     ExpressionAttributeNames:{
-            //         "#c": "Cidade"
-            //     },
-            //     ExpressionAttributeValues: {
-            //         ":c":cidade
-            //     }
-            // };
-            
-            // dynamo.query(paramsQuery, function(err, data) {
-            //     if (err) {
-            //         console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
-            //     } else {
-            //         console.log("Query succeeded.");
-            //         data.Items.forEach(function(item) {
-            //             console.log("Valor na tabela: " + item.VaiChover);
-            //             last = item.VaiChover;
-            //             if (last == "false"){
-            //                 let params = {
-            //                 TableName:table,
-            //                     Key:{
-            //                         "Cidade": cidade
-            //                     },
-            //                     UpdateExpression: "set VaiChover = :vc",
-            //                     ExpressionAttributeValues:{
-            //                         ":vc":"true"
-            //                     },
-            //                     ReturnValues:"UPDATED_NEW"
-            //                 };
-                            
-            //                 console.log("Atualizando a tabela...");
-            //                 dynamo.update(params, function(err, data) {
-            //                     if (err) {
-            //                         console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
-            //                     } else {
-            //                         console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
-            //                         console.log("Enviando tweet...");
-                                    
-            //                         let optionsTelegram = {
-            //                           'method': 'POST',
-            //                           'url': telegramBotURL + '?message=' + body,
-            //                           'headers': {
-            //                           }
-            //                         };
-            //                         request(optionsTelegram, function (error, response) { 
-            //                           if (error) throw new Error(error);
-            //                           console.log(response.body);
-            //                         });
-                                    
-            //                         sendTweet(body).then(function(result){
-            //                             callback(null,"Tweet enviado: " + body);
-            //                             },function(error){
-            //                                 console.log("Error:");
-            //                                 console.log(error);
-            //                                 callback(error);
-            //                             });
-            //                     }
-            //                 });
-            //             }
-            //         });
-            //     }
-            // });              
-        // }else{
-        //     console.log("Updating status in the database...");
-        //     client.query("UPDATE cidades SET vaichover=false WHERE cidade='BEL';", (err, res) => {
-        //         if (err) throw err;
-        //         console.log('Update succeeded. Row count:', res.rowCount);
-        //         client.end();
-        //     });
-        // }
     });
-    res.on('error', (e) => console.log(`error: ${e}`));
-});
-req.end();
+}
+
+// Runs service
+vaiChoverBelem()
+.catch((e) => console.log(e));
