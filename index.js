@@ -4,8 +4,22 @@ const http = require('http');
 const request = require('request');
 var _ = require('lodash');
 
-const url = "http://www.redemet.aer.mil.br/api/consulta_automatica/index.php?local=sbjc,sbbe&msg=metar";
+// REDEMET
+const redemetKey = process.env.REDEMET_KEY;
+const url = process.env.REDEMET_URL;
+
+// DATABASE
 const connectionString = process.env.DATABASE_URL;
+
+// TELEGRAM
+const telegramBotURL = process.env.TELEGRAM_BOT_URL;
+
+// TWITTER
+const sendTweetURL = process.env.SEND_TWEET_URL;
+const consumerKey = process.env.CONSUMER_KEY;
+const consumerSecret = process.env.CONSUMER_SECRET;
+const accessTokenKey = process.env.ACCESS_TOKEN_KEY;
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 
 /**
  * Checks if the database is local (dev) or production

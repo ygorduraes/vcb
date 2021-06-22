@@ -21,11 +21,26 @@ Logs: `heroku logs -t -a vaichoverbelem`
 
 `heroku ps:scale -a vaichoverbelem worker=1`
 
-## Testing
-- Run `npm test`
+## Testing environment
+- Run `npm test` to start the local api for development support. Add the endpoints to the `.env` file as described below.
 
 ## CI/CD
 `TO DO`
+
+## .env
+
+Create a `.env` file at the repository root with the following info:
+```
+REDEMET_KEY=
+REDEMET_URL=
+DATABASE_URL=
+TELEGRAM_BOT_URL=
+SEND_TWEET_URL=
+CONSUMER_KEY=
+CONSUMER_SECRET=
+ACCESS_TOKEN_KEY=
+ACCESS_TOKEN_SECRET=
+```
 
 ## Database
 This project uses Postgres as the database to store the last rain status.
@@ -42,7 +57,7 @@ Connecting to Heroku's database: `heroku pg:psql -a vaichoverbelem`
 
 Pulling the database locally (for development): `heroku pg:pull postgresql-polished-86943 vaichoverbelem -a vaichoverbelem`
 
-Create a `.env` file with the connection info:
+Add to the `.env` file the connection info:
 ```
 DATABASE_URL=postgres://username:password@localhost:5432/vaichoverbelem
 ```
