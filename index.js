@@ -108,8 +108,6 @@ function sendTweet(message) {
     access_token_key: accessTokenKey,
     access_token_secret: accessTokenSecret,
     tweet: message,
-    search: '@ygorduraes',
-    count: 5,
   });
 
   const headers = {
