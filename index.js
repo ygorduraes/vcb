@@ -127,8 +127,8 @@ function sendTweet(message) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
       res.on('data', (bufferData) => {
-        // const data = bufferData.toString();
-        resolve({ res, bufferData });
+        const data = bufferData.toString();
+        resolve({ res, data });
       });
     });
 
