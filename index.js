@@ -1,6 +1,5 @@
 require('dotenv').config();
 const { Client } = require('pg');
-// const http = require('http'); // Change to http on localhost tests
 const https = require('https');
 const _ = require('lodash');
 
@@ -168,7 +167,7 @@ async function vaiChoverBelem() {
   // Looks for rain
   const metarRain = checkRain(metar);
   // const metarRain = true; // TESTING PURPOSES, KEEP COMMENTED ON PRODUCTION
-  // console.log('Rain:', metarRain);
+  console.log('Rain:', metarRain);
   if (metarRain) {
     console.log('🌧');
   }
