@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { Client } = require('pg');
-const http = require('http');
+// const http = require('http'); // Change to http on localhost tests
 const https = require('https');
 const _ = require('lodash');
 
@@ -17,7 +17,7 @@ const connectionString = process.env.DATABASE_URL;
 
 // TWITTER
 const twitterURL = process.env.TWITTER_URL;
-const sendTweetPath = '/api/v1/search';
+const sendTweetPath = '/api/v1/tweet';
 const consumerKey = process.env.CONSUMER_KEY;
 const consumerSecret = process.env.CONSUMER_SECRET;
 const accessTokenKey = process.env.ACCESS_TOKEN_KEY;
@@ -55,7 +55,8 @@ const getMETAR = async () => {
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      res.on('data', (data) => {
+      res.on('data', (bufferData) => {
+        const data = bufferData.toString();
         resolve({ res, data });
       });
     });
@@ -117,14 +118,14 @@ function sendTweet(message) {
 
   const options = {
     url: twitterURL,
-    port: 3000,
+    port: 443,
     path: sendTweetPath,
     method: 'POST',
     headers,
   };
 
   return new Promise((resolve, reject) => {
-    const req = http.request(options, (res) => {
+    const req = https.request(options, (res) => {
       res.on('data', (bufferData) => {
         const data = bufferData.toString();
         resolve({ res, data });
@@ -164,40 +165,28 @@ async function vaiChoverBelem() {
   const metar = body.data.data;
   console.log('METARs:', metar);
 
-  // let testMetar  = [
-  //     {
-  //       id_localidade: 'SBBE',
-  //       validade_inicial: '2021-06-22 14:00:00',
-  //       mens: 'METAR SBBE 221400Z 09008KT 9999 SCT030 30/23 Q1014=',
-  //       recebimento: '2021-06-22 13:49:22'
-  //     },
-  //     {
-  //       id_localidade: 'SBJC',
-  //       validade_inicial: '2021-06-22 14:00:00',
-  //       mens: 'METAR SBJC 221400Z 10002KT 9999 BKN020 30/25 Q1014=',
-  //       recebimento: '2021-06-22 13:54:57'
-  //     }
-  // ];
-
   // Looks for rain
   const metarRain = checkRain(metar);
-  // const metarRain = true; // TESTING PURPOSES
-  console.log('Rain:', metarRain);
+  // const metarRain = true; // TESTING PURPOSES, KEEP COMMENTED ON PRODUCTION
+  // console.log('Rain:', metarRain);
+  if (metarRain) {
+    console.log('🌧');
+  }
 
   client.connect();
   // Consulta se o ultimo status é de chuva (true)
-  client.query("SELECT * FROM cidades WHERE cidade='BEL';", (err, res) => {
-    if (err) throw err;
-    const belResult = _.find(res.rows, ['cidade', 'BEL']);
+  client.query("SELECT * FROM cidades WHERE cidade='BEL';", (errSel, resSel) => {
+    if (errSel) throw errSel;
+    const belResult = _.find(resSel.rows, ['cidade', 'BEL']);
     const belRain = belResult.vaichover;
     console.log('Database status:', belRain);
 
     // Updates status in the database if they're different
     if (belRain !== metarRain) {
       console.log(`Updating rain status (${metarRain}) in the database...`);
-      client.query(`UPDATE cidades SET vaichover=${metarRain} WHERE cidade='BEL';`, (err, res) => {
-        if (err) throw err;
-        console.log('Update succeeded. Row count:', res.rowCount);
+      client.query(`UPDATE cidades SET vaichover=${metarRain} WHERE cidade='BEL';`, (errUpd, resUpd) => {
+        if (errUpd) throw errUpd;
+        console.log('Update succeeded. Row count:', resUpd.rowCount);
         client.end();
       });
     }
@@ -210,10 +199,9 @@ async function vaiChoverBelem() {
 
       // Sends Tweet
       console.log('Sending tweet...');
-      sendTweet('Teste').then((sentTweet) => {
+      sendTweet(message).then((sentTweet) => {
         console.log('Tweet statusCode:', sentTweet.res.statusCode);
-        console.log('Tweet data:', sentTweet.data);
-        console.log('Tweet sent:', message);
+        console.log('Tweet response:', sentTweet.data);
         // return;
       });
     }
