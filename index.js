@@ -165,8 +165,8 @@ async function vaiChoverBelem() {
   console.log('METARs:', metar);
 
   // Looks for rain
-  const metarRain = checkRain(metar);
-  // const metarRain = true; // TESTING PURPOSES, KEEP COMMENTED ON PRODUCTION
+  // const metarRain = checkRain(metar);
+  const metarRain = true; // TESTING PURPOSES, KEEP COMMENTED ON PRODUCTION
   console.log('Rain:', metarRain);
   if (metarRain) {
     console.log('🌧');
