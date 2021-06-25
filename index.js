@@ -228,12 +228,12 @@ async function vaiChoverBelem() {
         console.log('Tweet response:', sentTweet.data);
       });
 
-      console.log('Sending telegram...');
       // Sends Telegram message
-      sendTelegram(message).then((sentTelegram) => {
-        console.log('Telegram statusCode:', sentTelegram.res.statusCode);
-        console.log('Telegram response:', sentTelegram.data);
-      });
+      // console.log('Sending telegram...');
+      // sendTelegram(message).then((sentTelegram) => {
+      //   console.log('Telegram statusCode:', sentTelegram.res.statusCode);
+      //   console.log('Telegram response:', sentTelegram.data);
+      // });
     }
 
     // Does nothing if the status is the same
