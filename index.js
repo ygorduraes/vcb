@@ -239,7 +239,6 @@ async function vaiChoverBelem() {
     if (belRain === metarRain) {
       console.log(`Database status is the same (${belRain}), do nothing.`);
       client.end();
-      // return;
     }
   });
 }
