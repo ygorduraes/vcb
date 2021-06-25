@@ -123,6 +123,8 @@ function sendTweet(message) {
     headers,
   };
 
+  console.log('Tweet URL:', twitterURL);
+
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
       res.on('data', (bufferData) => {
