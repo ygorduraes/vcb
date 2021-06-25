@@ -116,7 +116,7 @@ function sendTweet(message) {
   };
 
   const options = {
-    url: twitterURL,
+    hostname: twitterURL,
     port: 443,
     path: sendTweetPath,
     method: 'POST',
