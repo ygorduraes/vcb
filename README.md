@@ -22,27 +22,29 @@ Logs: `heroku logs -t -a vaichoverbelem`
 `heroku ps:scale -a vaichoverbelem worker=1`
 
 ## Testing environment
-- Run `npm test` to start the local api for development support. Add the endpoints to the `.env` file as described below.
+- Run `npm run api` to start the local api for development support. Add the endpoints to the `.env` file as described below.
 
 ## CI/CD
 `TO DO`
 
-## .env
+## .env (development-only)
 
 Create a `.env` file at the repository root with the following info:
 ```
-REDEMET_KEY=
-REDEMET_URL=
-DATABASE_URL=
-TELEGRAM_BOT_URL=
-SEND_TWEET_URL=
-CONSUMER_KEY=
-CONSUMER_SECRET=
-ACCESS_TOKEN_KEY=
-ACCESS_TOKEN_SECRET=
+NODE_TLS_REJECT_UNAUTHORIZED=0
+REDEMET_KEY=12345
+REDEMET_URL=localhost
+DATABASE_URL=(see ##Database section)
+TELEGRAM_BOT_URL=localhost
+TELEGRAM_ENDPOINT=/s2qg75htis92xq92172kapow1go0s3ul
+TWITTER_URL=localhost
+CONSUMER_KEY=12345
+CONSUMER_SECRET=12345
+ACCESS_TOKEN_KEY=12345
+ACCESS_TOKEN_SECRET=12345
 ```
 
-Note: REDEMET's API for METAR info is `https://api-redemet.decea.mil.br/mensagens/metar/SBJC,SBBE`. You'll ned an API Key, which you can request at https://www.atd-1.com/cadastro-api/ (you might receive it instantly at your e-mail).
+Note: Production's REDEMET's API for METAR info is `https://api-redemet.decea.mil.br/mensagens/metar/SBJC,SBBE`. You'll ned an API Key, which you can request at https://www.atd-1.com/cadastro-api/ (you might receive it instantly at your e-mail).
 
 ## Database
 This project uses Postgres as the database to store the last rain status.

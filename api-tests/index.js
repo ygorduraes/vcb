@@ -7,6 +7,7 @@ const api = express();
 const port = 443;
 const tweetEndpoint = '/api/v1/tweet';
 const redemetEndpoint = '/mensagens/metar/SBJC,SBBE';
+const telegramEndpoint = '/s2qg75htis92xq92172kapow1go0s3ul';
 
 api.use(express.json());
 
@@ -60,6 +61,27 @@ api.get(redemetEndpoint, (req, res) => {
   }
 
   console.log('x-api-key found in the Headers');
+
+  res.send(responseTest);
+});
+
+/**
+ * Send Telegram message endpoint (tests only)
+ */
+api.get(telegramEndpoint, (req, res) => {
+  const { message } = req.query;
+
+  // Validates message
+  if (!message) {
+    const error = 'Missing message';
+    console.log(`Error: ${error}`);
+    res.status(500);
+    res.send({ error });
+    return;
+  }
+
+  console.log(`Telegram message sent: ${message}`);
+  const responseTest = `Telegram message sent: ${message}`;
 
   res.send(responseTest);
 });

@@ -12,7 +12,8 @@ const redemetPath = '/mensagens/metar/SBJC,SBBE';
 const connectionString = process.env.DATABASE_URL;
 
 // TELEGRAM
-// const telegramBotURL = process.env.TELEGRAM_BOT_URL;
+const telegramBotURL = process.env.TELEGRAM_BOT_URL;
+const telegramEndpoint = process.env.TELEGRAM_ENDPOINT;
 
 // TWITTER
 const twitterURL = process.env.TWITTER_URL;
@@ -140,6 +141,31 @@ function sendTweet(message) {
   });
 }
 
+function sendTelegram(message) {
+  const completeTelegramPath = encodeURI(`${telegramEndpoint}?message=${message}`);
+  const options = {
+    hostname: telegramBotURL,
+    port: 443,
+    path: completeTelegramPath,
+    method: 'GET',
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      res.on('data', (bufferData) => {
+        const data = bufferData.toString();
+        resolve({ res, data });
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    req.end();
+  });
+}
+
 async function vaiChoverBelem() {
   // Gets Hours and Minutes
   const now = getNow();
@@ -193,15 +219,19 @@ async function vaiChoverBelem() {
     // Sends tweet if database rain is false and METAR rain is true
     if (!belRain && metarRain) {
       const message = `Vai chover ${now}`;
-      // Sends Telegram message
-      // TO DO
 
       // Sends Tweet
       console.log('Sending tweet...');
       sendTweet(message).then((sentTweet) => {
         console.log('Tweet statusCode:', sentTweet.res.statusCode);
         console.log('Tweet response:', sentTweet.data);
-        // return;
+      });
+
+      console.log('Sending telegram...');
+      // Sends Telegram message
+      sendTelegram(message).then((sentTelegram) => {
+        console.log('Telegram statusCode:', sentTelegram.res.statusCode);
+        console.log('Telegram response:', sentTelegram.data);
       });
     }
 
