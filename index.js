@@ -126,14 +126,9 @@ function sendTweet(message) {
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      let data = '';
       res.on('data', (bufferData) => {
-        data += bufferData.toString();
-        // resolve({ res, data });
-      });
-      res.on('end', () => {
-        const parsedData = JSON.parse(data);
-        resolve({ res, parsedData });
+        const data = bufferData.toString();
+        resolve({ res, data });
       });
     });
 
