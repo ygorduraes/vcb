@@ -1,6 +1,9 @@
 name: VaiChoverBelem Worker
 
 on:
+  push:
+    branches:
+      - master
   schedule:
     # Runs every 5 minutes
     - cron:  '*/5 * * * *'
