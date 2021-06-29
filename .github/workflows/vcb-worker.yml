@@ -12,6 +12,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Sets environment variables
         env:
           ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
@@ -24,7 +25,6 @@ jobs:
           TELEGRAM_BOT_URL: ${{ secrets.TELEGRAM_BOT_URL }}
           TELEGRAM_ENDPOINT: ${{ secrets.TELEGRAM_ENDPOINT }}
           TWITTER_URL: ${{ secrets.TWITTER_URL }}
-      - uses: actions/checkout@v2
       - name: Cache node modules
         uses: actions/cache@v2
         env:
