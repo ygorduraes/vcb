@@ -17,6 +17,14 @@ Vai Chover Belém
 ## CI/CD
 This project uses CircleCI to run the app every 5 minutes. This rule is defined in the file `.circleci/config.yml`.
 
+## Twitter and Telegram
+
+Twitter's API keys were generated in https://developer.twitter.com, are stored securely and set up on CircleCI.
+
+Integromat's endpoint for Telegram integration is available at https://www.integromat.com, and also set up on CircleCI.
+
+**These keys are only needed for production and not required for development.**
+
 ## .env (development-only)
 
 Create a `.env` file at the repository root with the following info:
@@ -33,13 +41,13 @@ ACCESS_TOKEN_KEY=12345
 ACCESS_TOKEN_SECRET=12345
 ```
 
-Note: Production's REDEMET's API for METAR info is `https://api-redemet.decea.mil.br/mensagens/metar/SBJC,SBBE`. You'll ned an API Key, which you can request at https://www.atd-1.com/cadastro-api/ (you might receive it instantly at your e-mail).
+Note: Production's REDEMET's API for METAR info is `https://api-redemet.decea.mil.br/mensagens/metar/SBJC,SBBE`. You'll ned an API Key if you want to test with real data, which you can request at https://www.atd-1.com/cadastro-api/ (you might receive it instantly at your e-mail).
 
 ## Database
 This project uses Postgres as the database to store the last rain status. Currently, the project uses a Heroku free Postgres instance for production.
 
-Postgres's database info on Heroku: `heroku pg:info -a vaichoverbelem`
-Connecting to Heroku's database: `heroku pg:psql -a vaichoverbelem`
+- Postgres's database info on Heroku: `heroku pg:info -a vaichoverbelem`
+- Connecting to Heroku's database: `heroku pg:psql -a vaichoverbelem`
 
 ### Local database for development
 
@@ -50,6 +58,8 @@ Stop postgre (macOS): `brew services stop postgres`
 For other operational systems, please check the official Postgres documentation
 
 Pulling the database locally (for development): `heroku pg:pull postgresql-polished-86943 vaichoverbelem -a vaichoverbelem`
+
+> TO DO: Database migrations for development
 
 Update the `.env` file with the connection info:
 ```
