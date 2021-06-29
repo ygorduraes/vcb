@@ -7,7 +7,7 @@ const api = express();
 const port = 443;
 const tweetEndpoint = '/api/v1/tweet';
 const redemetEndpoint = '/mensagens/metar/SBJC,SBBE';
-const telegramEndpoint = '/s2qg75htis92xq92172kapow1go0s3ul';
+const telegramEndpoint = '/telegram';
 
 api.use(express.json());
 
