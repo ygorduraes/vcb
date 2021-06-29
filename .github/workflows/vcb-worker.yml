@@ -40,5 +40,4 @@ jobs:
           REDEMET_URL: ${{ secrets.REDEMET_URL }}
           TELEGRAM_BOT_URL: ${{ secrets.TELEGRAM_BOT_URL }}
           TELEGRAM_ENDPOINT: ${{ secrets.TELEGRAM_ENDPOINT }}
-          TWITTER_URL: ${{ secrets.TWITTER_URL }}
         run: npm start
