@@ -12,6 +12,18 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - name: Sets environment variables
+        env:
+          ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDEMET_KEY: ${{ secrets.REDEMET_KEY }}
+          REDEMET_URL: ${{ secrets.REDEMET_URL }}
+          TELEGRAM_BOT_URL: ${{ secrets.TELEGRAM_BOT_URL }}
+          TELEGRAM_ENDPOINT: ${{ secrets.TELEGRAM_ENDPOINT }}
+          TWITTER_URL: ${{ secrets.TWITTER_URL }}
       - uses: actions/checkout@v2
       - name: Cache node modules
         uses: actions/cache@v2
