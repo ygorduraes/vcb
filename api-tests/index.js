@@ -5,7 +5,6 @@ const fs = require('fs');
 const api = express();
 
 const port = 443;
-const tweetEndpoint = '/api/v1/tweet';
 const redemetEndpoint = '/mensagens/metar/SBJC,SBBE';
 const telegramEndpoint = '/telegram';
 
@@ -84,57 +83,6 @@ api.get(telegramEndpoint, (req, res) => {
   const responseTest = `Telegram message sent: ${message}`;
 
   res.send(responseTest);
-});
-
-/**
- * Twitter post endpoint
- */
-api.post(tweetEndpoint, (req, res) => {
-  console.log(`Requested Tweet endpoint at ${tweetEndpoint}`);
-
-  // Validates body
-  if (!req.body) {
-    const error = 'Missing body';
-    console.log(`Error: ${error}`);
-    res.send({ error });
-    return;
-  }
-
-  const { body } = req;
-
-  const { tweet } = body;
-
-  // Checks if search exist
-  if (!tweet) {
-    const error = 'Missing tweet message';
-    console.log(`Error: ${error}`);
-    res.send({ error });
-    return;
-  }
-
-  console.log('Tweet message:', tweet);
-
-  // Checks if credentials exist
-  const consumerKey = body.consumer_key;
-  const consumerSecret = body.consumer_secret;
-  const accessToken = body.access_token_key;
-  const accessSecret = body.access_token_secret;
-
-  if (!consumerKey
-        || !consumerSecret
-        || !accessToken
-        || !accessSecret) {
-    const error = 'Missing credentials';
-    console.log(`Error: ${error}`);
-    res.send({ error });
-    return;
-  }
-
-  console.log('All credentials received.');
-
-  const responseFinal = `Tweet sent: ${tweet}`;
-  console.log(responseFinal);
-  res.send(responseFinal);
 });
 
 const httpsServer = https.createServer(httpsOptions, api);
