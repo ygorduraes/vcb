@@ -1,8 +1,9 @@
 {
   "name": "vcb",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Vai Chover Belém",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "api": "node api-tests/index.js"
@@ -20,8 +21,10 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "fetch-base64": "^2.1.2",
     "http": "^0.0.1-security",
     "lodash": "^4.17.21",
+    "node-fetch": "^3.2.4",
     "pg": "^8.6.0",
     "twit": "^2.2.11"
   },

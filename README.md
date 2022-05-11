@@ -52,8 +52,10 @@ This project uses Postgres as the database to store the last rain status. Curren
 ### Local database for development
 
 Postgres installation (macOS): `brew install postgresql`
-Start postgre (macOS): `brew services start postgres`
-Stop postgre (macOS): `brew services stop postgres`
+Start postgres (macOS): `brew services start postgres`
+Stop postgres (macOS): `brew services stop postgres`
+
+Or if using manual command (need to write more about this): `pg_ctl -D /usr/local/var/postgres/data -l logfile start`
 
 For other operational systems, please check the official Postgres documentation
 
