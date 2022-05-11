@@ -1,8 +1,16 @@
-require('dotenv').config();
-const { Client } = require('pg');
-const https = require('https');
-const Twitter = require('twit');
-const _ = require('lodash');
+import 'dotenv/config';
+import pkg from 'pg';
+import https from 'https';
+import Twitter from 'twit';
+import _ from 'lodash';
+import getClimaAoVentoURL, { base64Photo } from './climaAoVento.js';
+
+const { Client } = pkg;
+// require('dotenv').config();
+// const { Client } = require('pg');
+// const https = require('https');
+// const Twitter = require('twit');
+// const _ = require('lodash');
 
 // REDEMET
 const redemetKey = process.env.REDEMET_KEY;
@@ -21,6 +29,13 @@ const consumerKey = process.env.CONSUMER_KEY;
 const consumerSecret = process.env.CONSUMER_SECRET;
 const accessTokenKey = process.env.ACCESS_TOKEN_KEY;
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+
+const twitter = new Twitter({
+  consumer_key: consumerKey,
+  consumer_secret: consumerSecret,
+  access_token: accessTokenKey,
+  access_token_secret: accessTokenSecret,
+});
 
 /**
  * Checks if the database is local (dev) or production
@@ -101,16 +116,32 @@ const checkRain = (metar) => {
   return metarRain;
 };
 
-function sendTweet(message) {
-  const twitter = new Twitter({
-    consumer_key: consumerKey,
-    consumer_secret: consumerSecret,
-    access_token: accessTokenKey,
-    access_token_secret: accessTokenSecret,
-  });
+const getMediaID = async (b64content) => {
+  const content = {
+    media_data: b64content,
+  };
+
+  try {
+    const updloadData = await twitter.post('media/upload', content);
+    const mediaID = updloadData.data.media_id_string;
+    return mediaID;
+  } catch {
+    return false;
+  }
+};
+
+function sendTweet(message, mediaID) {
+  const content = {
+    status: message,
+  };
+
+  if (mediaID) {
+    content.media_ids = [mediaID];
+  }
 
   return new Promise((resolve, reject) => {
-    twitter.post('statuses/update', { status: message })
+    // twitter.post('statuses/update', { status: message })
+    twitter.post('statuses/update', content)
       .then((tweetResponse) => {
         resolve(tweetResponse);
       })
@@ -200,16 +231,27 @@ async function vaiChoverBelem() {
       const message = `Vai chover ${now}`;
 
       // Sends Tweet
-      console.log('Sending tweet...');
-      sendTweet(message).then((sentTweet) => {
-        if (sentTweet.data) {
-          console.log('Sent tweet:', sentTweet.data.text);
-        }
+      console.log('Generating photo URL...');
+      const nowUTC = new Date();
+      const photoURL = getClimaAoVentoURL(nowUTC);
+      console.log('Photo URL:', photoURL);
+      console.log('Fetching photo...');
+      base64Photo(photoURL)
+        .then((b64content) => {
+          getMediaID(b64content)
+            .then((mediaID) => {
+              console.log('Sending tweet...');
+              sendTweet(message, mediaID).then((sentTweet) => {
+                if (sentTweet.data) {
+                  console.log('Sent tweet:', sentTweet.data.text);
+                }
 
-        if (!sentTweet.data) {
-          console.log('Error sending tweet:', sentTweet);
-        }
-      });
+                if (!sentTweet.data) {
+                  console.log('Error sending tweet:', sentTweet);
+                }
+              });
+            });
+        });
 
       // Sends Telegram message
       console.log('Sending telegram message...');
