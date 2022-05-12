@@ -11,7 +11,7 @@ let output;
  */
 const zapierStep = async () => {
   // Copy from here
-  const accuweatherEndpoint = 'http://dataservice.accuweather.com/forecasts/v1/daily/1day/44857?apikey=QnZovkVXNjgfPtArvRps9C9W4xKGPDP1&language=pt-br&details=true&metric=true';
+  const accuweatherEndpoint = 'http://dataservice.accuweather.com/forecasts/v1/daily/1day/44857?apikey=QnZovkVXNjgfPtArvRps9C9W4xKGPDP1&details=true&metric=true';
 
   const forecast = async (endpoint) => {
     try {
