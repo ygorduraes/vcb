@@ -32,12 +32,13 @@ const zapierStep = async () => {
   const { Headline, DailyForecasts } = todayForecast;
   const { Text } = Headline;
   const { RealFeelTemperature } = DailyForecasts[0];
-  const { RainProbability } = DailyForecasts[0].Day;
+  const { RainProbability, LongPhrase } = DailyForecasts[0].Day;
   const minimum = RealFeelTemperature.Minimum.Value;
   const maximum = RealFeelTemperature.Maximum.Value;
+  const forecastHeadline = `${Text}. ${LongPhrase}.`;
 
   output = [{
-    forecastHeadline: Text,
+    forecastHeadline,
     rainProbability: RainProbability,
     minimum,
     maximum,
